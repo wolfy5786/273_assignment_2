@@ -23,7 +23,7 @@ def notify():
     return json{notified: }"""
     start = time.time()
     resp = {"notified":True}
-    log.info(f'Service = notification_service, endpoing = /send, status = running, latency_ms ={int((time.time()-start)*1000)} ')
+    log.info(f'Service = notification_service, endpoint = /send, status = running, latency_ms ={int((time.time()-start)*1000)} ')
     return jsonify(resp)
 
 if __name__ == "main":
