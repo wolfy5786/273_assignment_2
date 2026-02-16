@@ -1,0 +1,59 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./broker/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  order_service:
+    build:
+      context: ./order_service
+    container_name: order_service
+    ports:
+      - "8080:8080"
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    volumes:
+      - ../utils:/app/utils:ro
+      - ../setup.py:/app/setup.py:ro
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  notification_service:
+    build:
+      context: ./notification_service
+    container_name: notification_service
+    ports:
+      - "8081:8081"
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    volumes:
+      - ../utils:/app/utils:ro
+      - ../setup.py:/app/setup.py:ro
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  inventory_service:
+    build:
+      context: ./inventory_service
+    container_name: inventory_service
+    ports:
+      - "8082:8082"
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    volumes:
+      - ../utils:/app/utils:ro
+      - ../setup.py:/app/setup.py:ro
+    depends_on:
+      rabbitmq:
+        condition: service_healthy

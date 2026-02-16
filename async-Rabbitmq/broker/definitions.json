@@ -1,0 +1,84 @@
+{
+  "exchanges": [
+    {
+      "name": "orders",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "inventory",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "dlx_exchange",
+      "vhost": "/",
+      "type": "fanout",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "queues": [
+    {
+      "name": "order_placed_queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "dlx_exchange"
+      }
+    },
+    {
+      "name": "inventory_reserved_queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "dlx_exchange"
+      }
+    },
+    {
+      "name": "dead_letter_queue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "orders",
+      "vhost": "/",
+      "destination": "order_placed_queue",
+      "destination_type": "queue",
+      "routing_key": "order.placed",
+      "arguments": {}
+    },
+    {
+      "source": "inventory",
+      "vhost": "/",
+      "destination": "inventory_reserved_queue",
+      "destination_type": "queue",
+      "routing_key": "inventory.reserved",
+      "arguments": {}
+    },
+    {
+      "source": "dlx_exchange",
+      "vhost": "/",
+      "destination": "dead_letter_queue",
+      "destination_type": "queue",
+      "routing_key": "",
+      "arguments": {}
+    }
+  ]
+}
