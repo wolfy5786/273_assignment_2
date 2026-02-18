@@ -1,0 +1,26 @@
+====================================================================
+  PART C – KAFKA STREAMING METRICS REPORT
+  Generated : 2026-02-15 22:38:37
+====================================================================
+
+[1] 10 000 Event Production
+  total_orders      : 10000
+  total_reserved    : 9813
+  total_failed      : 187
+  failure_rate      : 1.87 %
+  orders_per_minute : 249419.4
+
+[2] Consumer Lag (throttled @ 100 ms/msg)
+  peak lag    : 3000
+  final lag   : 2936
+  readings    : [3000, 3000, 3000, 2936, 2936, 2936, 2936, 2936, 2936, 2936, 2936, 2936] …
+
+[3] Replay Consistency
+  metric                           before      after
+  ──────────────────────────── ────────── ──────────
+  total_orders                      13000      13000
+  total_reserved                    13212      13212
+  total_failed                        235        235
+  failure_rate_pct                   1.75       1.75
+
+====================================================================
