@@ -1,5 +1,5 @@
 import structlog
-from utils import c_logging as logger
+from logging_utils import c_logging as logger
 
 from flask import Flask, jsonify
 
@@ -24,9 +24,9 @@ def notify():
     start = time.time()
     resp = {"notified":True}
     log.info(f'Service = notification_service, endpoint = /send, status = running, latency_ms ={int((time.time()-start)*1000)} ')
-    return jsonify(resp)
+    return jsonify(resp), 200
 
-if __name__ == "main":
+if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8081)
 
 

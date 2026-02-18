@@ -1,8 +1,8 @@
 import structlog
-from utils import c_logging as logger
+from logging_utils import c_logging as logger
 
 from flask import Flask, jsonify, request, abort
-
+import random
 
 import time
 
@@ -18,7 +18,7 @@ def health():
 
 @app.post("/reserve")
 def reserve_inventory():
-    """endpoint = /reserve, params?delay"""
+    """endpoint = /reserve, ?params = , delay="""
     #======================================Start the Clock===============================
     start = time.time()
     #====================================fetch the params===============================
@@ -30,6 +30,12 @@ def reserve_inventory():
         delay = 0 
     #====================================ADD Delay===================================================================
     time.sleep(delay)
+    
+    # #====================================ADD Random Delay (20% of the time)==========================================
+    # if random.random() < 0.2:  # 20% probability
+    #     random_delay = 2
+    #     log.info(f"Service = inventory_service, endpoint = /reserve, adding random delay of {random_delay}s")
+    #     time.sleep(random_delay)
     #====================================Induce Failure==============================================
     if fault == "true":
         log.info("service = inventory, endpoint  = /reserve, inducing error")
@@ -37,10 +43,10 @@ def reserve_inventory():
     #=======================================Respond===========================================================
     resp = {"status":"ok"}
     log.info(f'Service = inventory_service, endpoint = /reserve, status = running, latency_ms ={int((time.time()-start)*1000)} ')
-    return jsonify(resp)
+    return jsonify(resp),   200
 
 
-if __name__ == "main":
+if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8082)
 
 

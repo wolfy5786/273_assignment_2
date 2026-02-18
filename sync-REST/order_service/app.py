@@ -1,5 +1,5 @@
 import structlog
-from utils import c_logging as logger
+from logging_utils import c_logging as logger
 
 from flask import Flask, jsonify, request
 import requests
@@ -25,7 +25,7 @@ def health():
 
 @app.post("/order")
 def place_order():
-    """endpoint = /order, params : name?
+    """endpoint = /order, params : delay, fault
     return json{order_status:}"""
     #==================================Start the clock=============================
     start = time.time()
@@ -42,7 +42,7 @@ def place_order():
     }
     #=========================================send request to inventory=========================
     try : 
-        inventory_responce = requests.post(f'{INVENTORY_SERVICE}/reserve', params= params, timeout=(0.5,4))
+        inventory_responce = requests.post(f'{INVENTORY_SERVICE}/reserve', params= params, timeout=(0.5,3))
     except Timeout:
         log.exception(f'service = ORDER_SERVICE, endpoint  = /reserve,  inventory request Timedout, Order service =runnig, status = 503, latency = {int((time.time()-start)*1000)}')
         return jsonify(
@@ -61,7 +61,7 @@ def place_order():
         ), 503
     #=====================================Send request to notification=======================================================
     try :
-        notification_responce = requests.post(f'{INVENTORY_SERVICE}/reserve', params= params, timeout=(0.5,4))
+        notification_responce = requests.post(f'{NOTIFICATION_SERVICE}/send', timeout=(0.5,1))
     except Exception:
         log.exception(f'service = ORDER_SERVICE, endpoint  = /reserve,  notification service failure 400, Order service =runnig,  latency = {int((time.time()-start)*1000)}')
         return jsonify(
@@ -69,20 +69,18 @@ def place_order():
             notification_service = "unavailable",
             order_service = "okay"
         )
-    
+
     #=========================================End===============================================================================
     log.info(f'service = ORDER_SERVICE, endpoint  = /reserve,  all services running, Order service =runnig,  latency = {int((time.time()-start)*1000)}')
     return jsonify(
-            i_message = inventory_responce
-            n_message = notification_responce
+            i_message = inventory_responce.json(),
+            n_message = notification_responce.json(),
             inventory_service = "okay",
             notification_service = "okay",
-            order_service = "okay"
+            order_service = "okay",
         )
 
 
 
-if __name__ == "main":
+if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
-
-
